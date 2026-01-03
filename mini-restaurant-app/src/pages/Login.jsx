@@ -9,15 +9,17 @@ export default function Login(){
     const navigate = useNavigate();
 
     const handleLogin = ()=>{
-        if(email === "admin@gmail.com" && password==="admin1234"){
-            login({ role: "admin", email});
+        const userEmail = email.trim();
+        const UserPassword=password.trim();
+        if(userEmail === "admin@gmail.com" && UserPassword==="admin1234"){
+            login({ role: "admin", email:userEmail});
             navigate("/admin/dashboard");
             return;
         }
         if(
-            email === "customer@gamil.com" && password === "customer1234"
+            userEmail === "customer@gamil.com" && UserPassword === "customer1234"
         ){
-            login({role: "customer", email});
+            login({role: "customer", email:userEmail});
             navigate("/customers/dashboard");
             return;
         }
@@ -28,7 +30,7 @@ export default function Login(){
     return (
         <div className="center">
             <h2>Login</h2>
-            <input placeholder="Email" onChange={(e)=> setEmail(e.target.value)} />
+            <input type="email" value={email} placeholder="Email" onChange={(e)=> setEmail(e.target.value)} />
             <input 
             type="password"
             placeholder="password"
