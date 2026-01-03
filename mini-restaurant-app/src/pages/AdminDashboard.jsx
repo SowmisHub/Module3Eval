@@ -16,6 +16,15 @@ export default function AdminDashboard(){
         setRestaurants(data);
     }, []);
 
+    const handleDelete =(id)=>{
+        if (!confirm("Are you sure ou want to delete?")) return;
+
+        const updated = restaurants.filter((r)=>r.restaurantID !== id);
+        setRestaurants(updated);
+        localStorage.setItem("restData",JSON.stringify(updated));
+        alert("Restaurant deleted")
+    }
+
     const handleAdd =()=>{
         if(!form.name || !form.address){
             alert("Please fill all fields");

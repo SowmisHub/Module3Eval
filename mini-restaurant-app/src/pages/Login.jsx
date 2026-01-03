@@ -5,22 +5,24 @@ import { AuthContext } from "../context/AuthContext";
 export default function Login(){
     const [email,setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate();
     const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleLogin = ()=>{
         if(email === "admin@gmail.com" && password==="admin1234"){
-            login({ role: "admin"});
+            login({ role: "admin", email});
             navigate("/admin/dashboard");
+            return;
         }
-        else if(
+        if(
             email === "customer@gamil.com" && password === "customer1234"
         ){
-            login({role: "customer"});
+            login({role: "customer", email});
             navigate("/customers/dashboard");
-        }else{
-            alert("Invalid credentials")
+            return;
         }
+            alert("Invalid credentials")
+        
     };
 
     return (
@@ -30,6 +32,7 @@ export default function Login(){
             <input 
             type="password"
             placeholder="password"
+            value={password}
             onChange={(e)=> setPassword(e.target.value)}
             />
             <button onClick={handleLogin}>Login</button>
