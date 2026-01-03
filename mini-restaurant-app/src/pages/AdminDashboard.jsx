@@ -1,47 +1,66 @@
 import { useState, useEffect } from "react";
-import { getRestaurants, saveRestaurants } from "../utils/storage.js";
-import RestaurantCard from "../components/RestaurantCard.jsx";
+
+const IMAGE_URL = "https://coding-platform.s3.amazonaws.com/dev/lms/tickets/7524df6e-46fa-4506-8766-eca8da47c2f1/2izhqnTaNLdenHYF.jpeg"
 
 export default function AdminDashboard(){
-    const [list, setList] = useState([]);
+    const [restaurants, setRestaurants] = useState([]);
     const [form, setForm] = useState({
         name:"",
         address: "",
         type: "Rajasthani",
-        parking: "true",
-        image:"https://coding-platform.s3.amazonaws.com/dev/lms/tickets/7524df6e-46fa-4506-8766-eca8da47c2f1/2izhqnTaNLdenHYF.jpeg"
+        parking: "Yes",
     });
 
-    useEffect(()=>{
-        setList(getRestaurants());
+    useEffect(()=> {
+        const data =JSON.parse(localStorage.getItem("restData")) || [];
+        setRestaurants(data);
     }, []);
 
-    const addRestaurant =()=>{
+    const handleAdd =()=>{
         if(!form.name || !form.address){
-            alert("Fill all fields");
+            alert("Please fill all fields");
             return;
         }
-        const newData ={
+        const newRestaurant ={
             restaurantID: Date.now(),
-            ...form,
-            parking: form.parking === "true",
+            name: form.name,
+            address: form.address,
+            type: form.type,
+            parking: form.parking === "Yes",
+            image: IMAGE_URL,
         };
 
-        const updated =[...list, newData];
-        saveRestaurants(updated);
-        setForm(updated);
-        alert("Restaurant added")
-    };
-    return (
-        <div>
-            <h2>ADmin Dashboard</h2>
-            <div className="form">
-                <input placeholder="Name" onChange={(e)=> setForm({...form, name: e.target.value})} />
-                <input placeholder="Address" onChange={(e)=> setForm({...form, address: e.target.value})} />
+        const updatedList = [...restaurants, newRestaurant]
 
-                <select onChange={(e)=> setForm({...form, type:e.target.value})}>
+        setRestaurants(updatedList);
+        localStorage.setItem("restData", JSON.stringify(updatedList));
+        alert("Restaurant added succesfully");
+
+        setForm({
+            name:"",
+            address:"",
+            type:"Rajasthani",
+            parking: "Yes",
+        });
+    };
+
+    return (
+        <div className="admin-layout">
+            {/* LEFT SIDEBAR */}
+            <div className="sidebar">
+                <h3>Add Restaurant</h3>
+
+                <input placeholder="Restaurant Name"
+                value={form.name}
+                onChange={(e)=> setForm({...form, name:e.target.value})} />
+                <input placeholder="Restaurant address"
+                value={form.address}
+                onChange={(e)=> setForm({...form, address:e.target.value})} />
+
+                <select value={form.type}
+                onChange={(e)=> setForm({...form,type:e.target.value})}>
                     <option>Rajasthani</option>
-                    <option>Gujarat</option>
+                    <option>Gujarati</option>
                     <option>Mughlai</option>
                     <option>Jain</option>
                     <option>Thai</option>
@@ -49,19 +68,34 @@ export default function AdminDashboard(){
                     <option>South Indian</option>
                 </select>
 
-                <select onChange={(e)=> setForm({...form,parking: e.target.value})}>
-                    <option value="true">Parking Available</option>
-                    <option value="false">No parking</option>
+                <select value={form.parking}
+                onChange={(e)=>setForm({...form,parking:e.target.value})}>
+                    <option>Yes</option>
+                    <option>No</option>
                 </select>
 
-                <button onClick={addRestaurant}>Add</button>
-                
+                <button onClick={handleAdd}>Add Restaurant</button>
             </div>
-            <div className="grid">
-                {list.map((r)=>(
-                    <RestaurantCard key={r.restaurantID} data={r} admin />
-                ))}
+
+            <div className="content">
+                <h2>Admin Dashboard</h2>
+                <div className="card-grid">
+                    {restaurants.map((r)=>(
+                        <div className="card" key={r.restaurantID}>
+                            <img src={r.image} alt="restaurant"/>
+                            <h4>{r.name}</h4>
+                            <p>{r.address}</p>
+                            <p>{r.type}</p>
+                            <p>Parking: {r.parking ? "Yes" :"No"}</p>
+
+                            <div className="btn-group">
+                                <button>Update</button>
+                                <button>Delete</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
-    );
+    )
 }
